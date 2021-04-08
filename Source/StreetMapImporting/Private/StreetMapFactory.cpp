@@ -286,6 +286,7 @@ bool UStreetMapFactory::LoadFromOpenStreetMapXMLFile( UStreetMap* StreetMap, FSt
 					NewBuilding.BuildingName = OSMWay.Ref;
 				}
 
+				NewBuilding.Tags = OSMWay.Tags;
 				NewBuilding.Height = OSMWay.Height * OSMToCentimetersScaleFactor;
 				NewBuilding.BuildingLevels = OSMWay.BuildingLevels;
 

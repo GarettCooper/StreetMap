@@ -193,9 +193,12 @@ bool FOSMFile::ProcessAttribute( const TCHAR* AttributeName, const TCHAR* Attrib
 		if( !FCString::Stricmp( AttributeName, TEXT( "k" ) ) )
 		{
 			CurrentWayTagKey = AttributeValue;
+			
 		}
 		else if( !FCString::Stricmp( AttributeName, TEXT( "v" ) ) )
 		{
+			CurrentWayInfo->Tags.Add(CurrentWayTagKey, AttributeValue);
+
 			if( !FCString::Stricmp( CurrentWayTagKey, TEXT( "name" ) ) )
 			{
 				CurrentWayInfo->Name = AttributeValue;

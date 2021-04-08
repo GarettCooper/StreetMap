@@ -1,6 +1,6 @@
-# Street Map Plugin for UE4
+# Street Map Plugin for UE4 - Garett Cooper Fork
 
-This plugin allows you to import **OpenStreetMap** XML data into your **Unreal Engine 4** project as a new StreetMap asset type.  You can use the example **Street Map Component** to render streets and buildings.
+This plugin allows you to import **OpenStreetMap** XML data into your **Unreal Engine 4** project as a new StreetMap asset type.  You can use the example **Street Map Component** to render streets and buildings. It is a fork of the original plugin by Mike Fricker, adding support for Unreal Engine 4.26 and building Colour Customization by OSM tag
 
 ![UE4OSMBrooklyn](Docs/UE4OSMBrooklyn.png)
 

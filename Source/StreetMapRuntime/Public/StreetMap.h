@@ -98,6 +98,9 @@ public:
 	/** Buildings border vertical offset */
 	UPROPERTY(Category = StreetMap, EditAnywhere, meta = (ClampMin = "0", UIMin = "0"))
 		float BuildingBorderZ;
+	
+	UPROPERTY(Category = StreetMap, EditAnywhere)
+		TMap<FString, FLinearColor> KeyColorMap;
 
 	FStreetMapMeshBuildSettings() :
 		RoadOffesetZ(0.0f),
@@ -111,7 +114,8 @@ public:
 		HighwayColor(FLinearColor(0.25f, 0.95f, 0.25f)),
 		BuildingBorderThickness(20.0f),
 		BuildingBorderLinearColor(0.85f, 0.85f, 0.85f),
-		BuildingBorderZ(10.0f)
+		BuildingBorderZ(10.0f),
+		KeyColorMap(*new TMap<FString, FLinearColor>())
 	{
 	}
 
@@ -300,6 +304,9 @@ struct STREETMAPRUNTIME_API FStreetMapBuilding
 	/** 2D bounds (max) of this building's points */
 	UPROPERTY( Category=StreetMap, EditAnywhere )
 	FVector2D BoundsMax;
+
+	UPROPERTY(Category = StreetMap, EditAnywhere)
+	TMap<FString, FString> Tags;
 };
 
 

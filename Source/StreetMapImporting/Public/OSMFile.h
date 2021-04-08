@@ -169,6 +169,8 @@ public:
 
 		// If true, way is only traversable in the order the nodes are listed in the Nodes list
 		uint8 bIsOneWay : 1;
+
+		TMap<FString, FString> Tags;
 	};
 
 	// Minimum latitude/longitude bounds

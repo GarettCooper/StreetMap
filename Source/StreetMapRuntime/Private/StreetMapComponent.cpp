@@ -229,9 +229,24 @@ void UStreetMapComponent::GenerateMesh()
 	const float BuildingBorderZ = MeshBuildSettings.BuildingBorderZ;
 	const FColor BuildingBorderColor( BuildingBorderLinearColor.ToFColor( false ) );
 	const FColor BuildingFillColor( FLinearColor( BuildingBorderLinearColor * 0.33f ).CopyWithNewOpacity( 1.0f ).ToFColor( false ) );
+	const TMap<FString, FLinearColor> KeyColorMap = MeshBuildSettings.KeyColorMap;
 	/////////////////////////////////////////////////////////
 
+	TMap<FString, TMap<FString, FLinearColor>> KeyColorMapParsed;
+	for (auto& Pair : KeyColorMap)
+	{
+		FString key;
+		FString value;
+		Pair.Key.Split(TEXT("="), &key, &value);
 
+		if (!KeyColorMapParsed.Contains(key))
+		{
+			KeyColorMapParsed.Add(key, TMap<FString, FLinearColor>());
+		}
+		
+		KeyColorMapParsed[key].Add(value, Pair.Value);
+	}
+	
 	CachedLocalBounds = FBox( ForceInit );
 	Vertices.Reset();
 	Indices.Reset();
@@ -313,7 +328,20 @@ void UStreetMapComponent::GenerateMesh()
 					else if (Building.BuildingLevels > 0) {
 						BuildingFillZ = (float)Building.BuildingLevels * BuildingLevelFloorFactor;
 					}
-				}		
+				}
+
+				FColor ThisBuildingFillColor = BuildingFillColor;
+				if (Building.Tags.Num() > 0)
+				{
+					for (auto Tag : Building.Tags)
+					{
+						if (KeyColorMapParsed.Contains(Tag.Key) && KeyColorMapParsed[Tag.Key].Contains(Tag.Value))
+						{
+							ThisBuildingFillColor = KeyColorMapParsed[Tag.Key][Tag.Value].ToFColor(false);
+							break;
+						}
+					}
+				}
 
 				// Top of building
 				{
@@ -322,11 +350,12 @@ void UStreetMapComponent::GenerateMesh()
 					{
 						TempPoints[ PointIndex ] = FVector( Building.BuildingPoints[ ( Building.BuildingPoints.Num() - PointIndex ) - 1 ], BuildingFillZ );
 					}
-					AddTriangles( TempPoints, TriangulatedVertexIndices, FVector::ForwardVector, FVector::UpVector, BuildingFillColor, MeshBoundingBox );
+					AddTriangles( TempPoints, TriangulatedVertexIndices, FVector::ForwardVector, FVector::UpVector, ThisBuildingFillColor, MeshBoundingBox );
 				}
 
 				if( bWant3DBuildings && (Building.Height > KINDA_SMALL_NUMBER || Building.BuildingLevels > 0) )
 				{
+					
 					// NOTE: Lit buildings can't share vertices beyond quads (all quads have their own face normals), so this uses a lot more geometry!
 					if( bWantLitBuildings )
 					{
@@ -363,7 +392,7 @@ void UStreetMapComponent::GenerateMesh()
 							const FVector FaceNormal = FVector::CrossProduct( ( TempPoints[ 0 ] - TempPoints[ 2 ] ).GetSafeNormal(), ( TempPoints[ 0 ] - TempPoints[ 1 ] ).GetSafeNormal() );
 							const FVector ForwardVector = FVector::UpVector;
 							const FVector UpVector = FaceNormal;
-							AddTriangles( TempPoints, TempIndices, ForwardVector, UpVector, BuildingFillColor, MeshBoundingBox );
+							AddTriangles( TempPoints, TempIndices, ForwardVector, UpVector, ThisBuildingFillColor, MeshBoundingBox );
 						}
 					}
 					else
@@ -379,7 +408,7 @@ void UStreetMapComponent::GenerateMesh()
 							NewVertex.TextureCoordinate = FVector2D( 0.0f, 0.0f );	// NOTE: We're not using texture coordinates for anything yet
 							NewVertex.TangentX = FVector::ForwardVector;	 // NOTE: Tangents aren't important for these unlit buildings
 							NewVertex.TangentZ = FVector::UpVector;
-							NewVertex.Color = BuildingFillColor;
+							NewVertex.Color = ThisBuildingFillColor;
 
 							MeshBoundingBox += NewVertex.Position;
 						}
